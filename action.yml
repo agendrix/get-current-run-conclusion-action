@@ -1,11 +1,16 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: Get current run conclusion
+description: Compute the conclusion of the current workflow run
+author: 'l.boudreau@agendrix.com'
 inputs:
-  milliseconds: # change this
+  token:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: "This should be a personal access token with access to your repository. Ex: ${{ secrets.GITHUB_TOKEN }}"
+  deployments_outcome: 
+    required: false
+    description: "Outcome of the deployments. Accepted values are any values from DeploymentOutcome enum: https://github.com/agendrix/wait-for-ecs-service-deployment-action/blob/main/src/ecs/types.ts"
+outputs:
+  conclusion:
+    description: Conclusion of the current workflow run
 runs:
   using: 'node12'
   main: 'dist/index.js'

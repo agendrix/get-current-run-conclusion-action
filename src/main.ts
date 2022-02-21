@@ -1,18 +1,58 @@
 import * as core from "@actions/core";
-import { wait } from "./wait";
+import * as github from "@actions/github";
+import { createActionAuth } from "@octokit/auth-action";
+import {
+  DeploymentOutcome,
+  WorkflowRunConclusion,
+  JobConclusion
+} from "./types";
+import { validateRequiredInputs } from "../helpers/action/validateRequiredInputs";
+
+async function getJobConclusions() {
+  const auth = createActionAuth();
+  const authentication = await auth();
+  const octokit = github.getOctokit(authentication.token);
+  const response = await octokit.rest.actions.listJobsForWorkflowRun({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    run_id: github.context.runId
+  });
+
+  return response.data.jobs.reduce(
+    (acc, currentJob) => [...acc, currentJob.conclusion],
+    [] as Array<string | null>
+  );
+}
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput("milliseconds");
-    core.debug(`Waiting ${ms} milliseconds ...`); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+    validateRequiredInputs([
+      "run_id",
+      "token",
+      "repository",
+      "repository_owner"
+    ]);
+    const jobsConclusion = await getJobConclusions();
+    let conclusion = "";
+    if (jobsConclusion.includes(JobConclusion.FAILURE)) {
+      conclusion = WorkflowRunConclusion.FAILED;
+    } else if (jobsConclusion.includes(JobConclusion.CANCELLED)) {
+      conclusion = WorkflowRunConclusion.STOPPED;
+    } else {
+      const deploymentsOutcome = core.getInput("deployments_outcome");
+      if (
+        deploymentsOutcome &&
+        deploymentsOutcome.includes(DeploymentOutcome.SKIPPED)
+      ) {
+        conclusion = WorkflowRunConclusion.SKIPPED;
+      } else {
+        conclusion = WorkflowRunConclusion.SUCCEEDED;
+      }
+    }
 
-    core.debug(new Date().toTimeString());
-    await wait(parseInt(ms, 10));
-    core.debug(new Date().toTimeString());
-
-    core.setOutput("time", new Date().toTimeString());
+    core.setOutput("conclusion", conclusion);
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed(`Action failed with error ${error}`);
   }
 }
 
