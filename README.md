@@ -17,7 +17,7 @@ ping-slack:
       uses: agendrix/get-current-run-conclusion-action@v1.0.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        deployments_outcome: [ ${{ needs.main_deployment.deployment_outcome }} ]
+        deployments_outcome: ${{ needs.main_deployment.deployment_outcome }}
     - name: Ping Slack for outcome
       uses: agendrix/slack-notifier/ping-slack@v1.0.5
       with:

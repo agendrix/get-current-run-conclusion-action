@@ -24,6 +24,16 @@ async function getJobConclusions() {
   );
 }
 
+function hasSkippedDeployments() {
+  let deploymentOutcome = core.getInput("deployments_outcome");
+  try {
+    deploymentOutcome = JSON.parse(deploymentOutcome);
+    return deploymentOutcome.includes(DeploymentOutcome.SKIPPED);
+  } catch (parsingError) {
+    return deploymentOutcome === DeploymentOutcome.SKIPPED;
+  }
+}
+
 async function run(): Promise<void> {
   try {
     validateRequiredInputs([
@@ -39,11 +49,7 @@ async function run(): Promise<void> {
     } else if (jobsConclusion.includes(JobConclusion.CANCELLED)) {
       conclusion = WorkflowRunConclusion.STOPPED;
     } else {
-      const deploymentsOutcome = core.getInput("deployments_outcome");
-      if (
-        deploymentsOutcome &&
-        deploymentsOutcome.includes(DeploymentOutcome.SKIPPED)
-      ) {
+      if (hasSkippedDeployments()) {
         conclusion = WorkflowRunConclusion.SKIPPED;
       } else {
         conclusion = WorkflowRunConclusion.SUCCEEDED;

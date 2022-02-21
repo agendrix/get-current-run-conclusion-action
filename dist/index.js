@@ -90,10 +90,20 @@ function getJobConclusions() {
         const response = yield octokit.rest.actions.listJobsForWorkflowRun({
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
-            run_id: github.context.runId,
+            run_id: github.context.runId
         });
         return response.data.jobs.reduce((acc, currentJob) => [...acc, currentJob.conclusion], []);
     });
+}
+function hasSkippedDeployments() {
+    let deploymentOutcome = core.getInput("deployments_outcome");
+    try {
+        deploymentOutcome = JSON.parse(deploymentOutcome);
+        return deploymentOutcome.includes(types_1.DeploymentOutcome.SKIPPED);
+    }
+    catch (parsingError) {
+        return deploymentOutcome === types_1.DeploymentOutcome.SKIPPED;
+    }
 }
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -113,9 +123,7 @@ function run() {
                 conclusion = types_1.WorkflowRunConclusion.STOPPED;
             }
             else {
-                const deploymentsOutcome = core.getInput("deployments_outcome");
-                if (deploymentsOutcome &&
-                    deploymentsOutcome.includes(types_1.DeploymentOutcome.SKIPPED)) {
+                if (hasSkippedDeployments()) {
                     conclusion = types_1.WorkflowRunConclusion.SKIPPED;
                 }
                 else {
