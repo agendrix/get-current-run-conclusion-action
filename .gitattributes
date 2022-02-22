@@ -9,6 +9,7 @@ dist/** -diff linguist-generated=true
 package.json -export-ignore
 README.md -export-ignore
 LICENSE -export-ignore
+action.yml -export-ignore
 
 dist/** -export-ignore
 dist -export-ignore
