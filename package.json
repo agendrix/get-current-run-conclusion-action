@@ -1,23 +1,22 @@
 {
-  "name": "typescript-action",
-  "version": "0.0.0",
+  "name": "get-current-run-conclusion-action",
+  "version": "1.0.0",
   "private": true,
-  "description": "TypeScript template action",
-  "main": "lib/src/main.js",
+  "description": "Compute the conclusion of the current Github actions workflow run",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts helpers/**/*.ts",
-    "package": "ncc build --source-map --license licenses.txt",
-    "test": "jest --passWithNoTests",
-    "all": "yarn build && yarn format && yarn lint && yarn package && yarn test"
+    "package": "ncc build --license LICENSE ./src/main.ts -o ./dist",
+    "test": "jest --passWithNoTests"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/agendrix/get-current-run-conclusion-action.git"
   },
-  "author": "",
+  "author": "l.boudreau@agendrix.com",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.6",
@@ -38,6 +37,7 @@
     "js-yaml": "^4.0.0",
     "prettier": "2.2.1",
     "ts-jest": "^26.4.4",
-    "typescript": "^4.1.3"
+    "typescript": "^4.1.3",
+    "husky": "^7.0.0"
   }
 }

@@ -1,185 +1,6 @@
-require('./sourcemap-register.js');module.exports =
+module.exports =
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
-
-/***/ 3119:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.validateRequiredInputs = void 0;
-const core = __importStar(__nccwpck_require__(2186));
-/**
- * Validate that all required inputs were provided
- * If not, it will throw.
- */
-function validateRequiredInputs(requiredInputs) {
-    for (const requiredInput of requiredInputs) {
-        core.getInput(requiredInput, { required: true });
-    }
-}
-exports.validateRequiredInputs = validateRequiredInputs;
-
-
-/***/ }),
-
-/***/ 9536:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(2186));
-const github = __importStar(__nccwpck_require__(5438));
-const auth_action_1 = __nccwpck_require__(20);
-const types_1 = __nccwpck_require__(5945);
-const validateRequiredInputs_1 = __nccwpck_require__(3119);
-function getJobConclusions() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const auth = auth_action_1.createActionAuth();
-        const authentication = yield auth();
-        const octokit = github.getOctokit(authentication.token);
-        const response = yield octokit.rest.actions.listJobsForWorkflowRun({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            run_id: github.context.runId
-        });
-        return response.data.jobs.reduce((acc, currentJob) => [...acc, currentJob.conclusion], []);
-    });
-}
-function hasSkippedDeployments() {
-    let deploymentOutcome = core.getInput("deployments_outcome");
-    try {
-        deploymentOutcome = JSON.parse(deploymentOutcome);
-        return deploymentOutcome.includes(types_1.DeploymentOutcome.SKIPPED);
-    }
-    catch (parsingError) {
-        return deploymentOutcome === types_1.DeploymentOutcome.SKIPPED;
-    }
-}
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            validateRequiredInputs_1.validateRequiredInputs([
-                "run_id",
-                "token",
-                "repository",
-                "repository_owner"
-            ]);
-            const jobsConclusion = yield getJobConclusions();
-            let conclusion = "";
-            if (jobsConclusion.includes(types_1.JobConclusion.FAILURE)) {
-                conclusion = types_1.WorkflowRunConclusion.FAILED;
-            }
-            else if (jobsConclusion.includes(types_1.JobConclusion.CANCELLED)) {
-                conclusion = types_1.WorkflowRunConclusion.STOPPED;
-            }
-            else {
-                if (hasSkippedDeployments()) {
-                    conclusion = types_1.WorkflowRunConclusion.SKIPPED;
-                }
-                else {
-                    conclusion = types_1.WorkflowRunConclusion.SUCCEEDED;
-                }
-            }
-            core.setOutput("conclusion", conclusion);
-        }
-        catch (error) {
-            core.setFailed(`Action failed with error ${error}`);
-        }
-    });
-}
-run();
-
-
-/***/ }),
-
-/***/ 5945:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DeploymentOutcome = exports.JobConclusion = exports.WorkflowRunConclusion = void 0;
-/**
- * Workflow run conclusion: https://github.com/agendrix/slack-notifier/blob/main/lambda/workflows/github-actions.ts
- */
-var WorkflowRunConclusion;
-(function (WorkflowRunConclusion) {
-    WorkflowRunConclusion["FAILED"] = "FAILED";
-    WorkflowRunConclusion["STOPPED"] = "STOPPED";
-    WorkflowRunConclusion["SUCCEEDED"] = "SUCCEEDED";
-    WorkflowRunConclusion["SKIPPED"] = "SKIPPED";
-})(WorkflowRunConclusion = exports.WorkflowRunConclusion || (exports.WorkflowRunConclusion = {}));
-/**
- * Job conclusion: https://docs.github.com/en/rest/reference/actions#get-a-job-for-a-workflow-run
- */
-var JobConclusion;
-(function (JobConclusion) {
-    JobConclusion["SUCCESS"] = "success";
-    JobConclusion["FAILURE"] = "failure";
-    JobConclusion["CANCELLED"] = "cancelled";
-    JobConclusion["SKIPPED"] = "skipped";
-})(JobConclusion = exports.JobConclusion || (exports.JobConclusion = {}));
-/**
- * Deployment outcome: https://github.com/agendrix/wait-for-ecs-service-deployment-action/blob/main/src/ecs/types.ts
- */
-var DeploymentOutcome;
-(function (DeploymentOutcome) {
-    DeploymentOutcome["SUCCESS"] = "success";
-    DeploymentOutcome["SKIPPED"] = "skipped";
-})(DeploymentOutcome = exports.DeploymentOutcome || (exports.DeploymentOutcome = {}));
-
-
-/***/ }),
 
 /***/ 7351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
@@ -8289,6 +8110,185 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 8372:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.validateRequiredInputs = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+/**
+ * Validate that all required inputs were provided
+ * If not, it will throw.
+ */
+function validateRequiredInputs(requiredInputs) {
+    for (const requiredInput of requiredInputs) {
+        core.getInput(requiredInput, { required: true });
+    }
+}
+exports.validateRequiredInputs = validateRequiredInputs;
+
+
+/***/ }),
+
+/***/ 399:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+const auth_action_1 = __nccwpck_require__(20);
+const types_1 = __nccwpck_require__(5077);
+const validateRequiredInputs_1 = __nccwpck_require__(8372);
+function getJobConclusions() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const auth = auth_action_1.createActionAuth();
+        const authentication = yield auth();
+        const octokit = github.getOctokit(authentication.token);
+        const response = yield octokit.rest.actions.listJobsForWorkflowRun({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            run_id: github.context.runId
+        });
+        return response.data.jobs.reduce((acc, currentJob) => [...acc, currentJob.conclusion], []);
+    });
+}
+function hasSkippedDeployments() {
+    let deploymentOutcome = core.getInput("deployments_outcome");
+    try {
+        deploymentOutcome = JSON.parse(deploymentOutcome);
+        return deploymentOutcome.includes(types_1.DeploymentOutcome.SKIPPED);
+    }
+    catch (parsingError) {
+        return deploymentOutcome === types_1.DeploymentOutcome.SKIPPED;
+    }
+}
+function run() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            validateRequiredInputs_1.validateRequiredInputs([
+                "run_id",
+                "token",
+                "repository",
+                "repository_owner"
+            ]);
+            const jobsConclusion = yield getJobConclusions();
+            let conclusion = "";
+            if (jobsConclusion.includes(types_1.JobConclusion.FAILURE)) {
+                conclusion = types_1.WorkflowRunConclusion.FAILED;
+            }
+            else if (jobsConclusion.includes(types_1.JobConclusion.CANCELLED)) {
+                conclusion = types_1.WorkflowRunConclusion.STOPPED;
+            }
+            else {
+                if (hasSkippedDeployments()) {
+                    conclusion = types_1.WorkflowRunConclusion.SKIPPED;
+                }
+                else {
+                    conclusion = types_1.WorkflowRunConclusion.SUCCEEDED;
+                }
+            }
+            core.setOutput("conclusion", conclusion);
+        }
+        catch (error) {
+            core.setFailed(`Action failed with error ${error}`);
+        }
+    });
+}
+run();
+
+
+/***/ }),
+
+/***/ 5077:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DeploymentOutcome = exports.JobConclusion = exports.WorkflowRunConclusion = void 0;
+/**
+ * Workflow run conclusion: https://github.com/agendrix/slack-notifier/blob/main/lambda/workflows/github-actions.ts
+ */
+var WorkflowRunConclusion;
+(function (WorkflowRunConclusion) {
+    WorkflowRunConclusion["FAILED"] = "FAILED";
+    WorkflowRunConclusion["STOPPED"] = "STOPPED";
+    WorkflowRunConclusion["SUCCEEDED"] = "SUCCEEDED";
+    WorkflowRunConclusion["SKIPPED"] = "SKIPPED";
+})(WorkflowRunConclusion = exports.WorkflowRunConclusion || (exports.WorkflowRunConclusion = {}));
+/**
+ * Job conclusion: https://docs.github.com/en/rest/reference/actions#get-a-job-for-a-workflow-run
+ */
+var JobConclusion;
+(function (JobConclusion) {
+    JobConclusion["SUCCESS"] = "success";
+    JobConclusion["FAILURE"] = "failure";
+    JobConclusion["CANCELLED"] = "cancelled";
+    JobConclusion["SKIPPED"] = "skipped";
+})(JobConclusion = exports.JobConclusion || (exports.JobConclusion = {}));
+/**
+ * Deployment outcome: https://github.com/agendrix/wait-for-ecs-service-deployment-action/blob/main/src/ecs/types.ts
+ */
+var DeploymentOutcome;
+(function (DeploymentOutcome) {
+    DeploymentOutcome["SUCCESS"] = "success";
+    DeploymentOutcome["SKIPPED"] = "skipped";
+})(DeploymentOutcome = exports.DeploymentOutcome || (exports.DeploymentOutcome = {}));
+
+
+/***/ }),
+
 /***/ 2877:
 /***/ ((module) => {
 
@@ -8455,7 +8455,6 @@ module.exports = require("zlib");;
 /******/ 	// module exports must be returned from runtime so entry inlining is disabled
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	return __nccwpck_require__(9536);
+/******/ 	return __nccwpck_require__(399);
 /******/ })()
 ;
-//# sourceMappingURL=index.js.map

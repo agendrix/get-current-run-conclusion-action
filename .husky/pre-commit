@@ -1,0 +1,6 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+rm -rf ./dist
+yarn package
+git add ./dist
