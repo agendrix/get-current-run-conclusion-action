@@ -8110,47 +8110,6 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
-/***/ 8372:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.validateRequiredInputs = void 0;
-const core = __importStar(__nccwpck_require__(2186));
-/**
- * Validate that all required inputs were provided
- * If not, it will throw.
- */
-function validateRequiredInputs(requiredInputs) {
-    for (const requiredInput of requiredInputs) {
-        core.getInput(requiredInput, { required: true });
-    }
-}
-exports.validateRequiredInputs = validateRequiredInputs;
-
-
-/***/ }),
-
 /***/ 399:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -8189,7 +8148,6 @@ const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const auth_action_1 = __nccwpck_require__(20);
 const types_1 = __nccwpck_require__(5077);
-const validateRequiredInputs_1 = __nccwpck_require__(8372);
 function getJobConclusions() {
     return __awaiter(this, void 0, void 0, function* () {
         const auth = auth_action_1.createActionAuth();
@@ -8216,12 +8174,6 @@ function hasSkippedDeployments() {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            validateRequiredInputs_1.validateRequiredInputs([
-                "run_id",
-                "token",
-                "repository",
-                "repository_owner"
-            ]);
             const jobsConclusion = yield getJobConclusions();
             let conclusion = "";
             if (jobsConclusion.includes(types_1.JobConclusion.FAILURE)) {

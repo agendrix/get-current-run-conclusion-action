@@ -6,7 +6,6 @@ import {
   WorkflowRunConclusion,
   JobConclusion
 } from "./types";
-import { validateRequiredInputs } from "../helpers/action/validateRequiredInputs";
 
 async function getJobConclusions() {
   const auth = createActionAuth();
@@ -36,12 +35,6 @@ function hasSkippedDeployments() {
 
 async function run(): Promise<void> {
   try {
-    validateRequiredInputs([
-      "run_id",
-      "token",
-      "repository",
-      "repository_owner"
-    ]);
     const jobsConclusion = await getJobConclusions();
     let conclusion = "";
     if (jobsConclusion.includes(JobConclusion.FAILURE)) {

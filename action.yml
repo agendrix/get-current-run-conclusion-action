@@ -4,13 +4,14 @@ author: 'l.boudreau@agendrix.com'
 inputs:
   token:
     required: true
-    description: "This should be a personal access token with access to your repository. Ex: ${{ secrets.GITHUB_TOKEN }}"
+    description: "This should be a personal access token with access to your repository"
+    default: ${{ github.token }}
   deployment_outcome: 
     required: false
     description: >
       Outcome of the deployment(s). If you want the action to verify multiple deployments, you must stringify.
-      Accepted values are any values from DeploymentOutcome enum: https://github.com/agendrix/wait-for-ecs-service-deployment-action/blob/main/src/ecs/types.ts"
-      Ex: ${{ needs.deploy.deployment_outcome }} or ${{ toJSON([needs.deploy-1.deployment_outcome, needs.deploy-2.deployment_outcome]) }}
+      Accepted values are any values from DeploymentOutcome enum: https://github.com/agendrix/wait-for-ecs-service-deployment-action/blob/main/src/ecs/types.ts
+      Ex: ${{ need/s.deploy.deployment_outcome }} or ${{ toJSON([need/s.deploy-1.deployment_outcome, need/s.deploy-2.deployment_outcome]) }}
 outputs:
   conclusion:
     description: Conclusion of the current workflow run
