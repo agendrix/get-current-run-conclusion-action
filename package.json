@@ -1,6 +1,6 @@
 {
   "name": "get-current-run-conclusion-action",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Compute the conclusion of the current Github actions workflow run",
   "main": "dist/index.js",

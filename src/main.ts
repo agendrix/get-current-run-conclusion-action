@@ -24,7 +24,7 @@ async function getJobConclusions() {
 }
 
 function hasSkippedDeployments() {
-  let deploymentOutcome = core.getInput("deployments_outcome");
+  let deploymentOutcome = core.getInput("deployment_outcome");
   try {
     deploymentOutcome = JSON.parse(deploymentOutcome);
     return deploymentOutcome.includes(DeploymentOutcome.SKIPPED);
