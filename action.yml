@@ -16,5 +16,5 @@ outputs:
   conclusion:
     description: Conclusion of the current workflow run
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
