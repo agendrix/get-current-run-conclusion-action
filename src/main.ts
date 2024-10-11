@@ -1,13 +1,9 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { createActionAuth } from "@octokit/auth-action";
-import {
-  DeploymentOutcome,
-  WorkflowRunConclusion,
-  JobConclusion
-} from "./types";
+import { DeploymentOutcome, WorkflowRunConclusion, JobConclusion } from "./types";
 
-async function getJobConclusions() {
+async function getJobConclusions(): Promise<(string | null)[]> {
   const auth = createActionAuth();
   const authentication = await auth();
   const octokit = github.getOctokit(authentication.token);
@@ -17,18 +13,15 @@ async function getJobConclusions() {
     run_id: github.context.runId
   });
 
-  return response.data.jobs.reduce(
-    (acc, currentJob) => [...acc, currentJob.conclusion],
-    [] as Array<string | null>
-  );
+  return response.data.jobs.reduce((acc, currentJob) => [...acc, currentJob.conclusion], [] as (string | null)[]);
 }
 
-function hasSkippedDeployments() {
+function hasSkippedDeployments(): boolean {
   let deploymentOutcome = core.getInput("deployment_outcome");
   try {
     deploymentOutcome = JSON.parse(deploymentOutcome);
     return deploymentOutcome.includes(DeploymentOutcome.SKIPPED);
-  } catch (parsingError) {
+  } catch {
     return deploymentOutcome === DeploymentOutcome.SKIPPED;
   }
 }
