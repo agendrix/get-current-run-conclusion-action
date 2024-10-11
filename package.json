@@ -1,16 +1,12 @@
 {
-  "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
-  "version": "0.0.0",
-  "author": "",
+  "name": "get-current-run-conclusion-action",
+  "description": "Compute the conclusion of the current Github actions workflow run",
+  "author": "l.boudreau@agendrix.com",
   "private": true,
-  "homepage": "https://github.com/actions/typescript-action",
+  "homepage": "https://github.com/agendrix/get-current-run-conclusion-action.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
-  },
-  "bugs": {
-    "url": "https://github.com/actions/typescript-action/issues"
+    "url": "git+https://github.com/agendrix/get-current-run-conclusion-action.git"
   },
   "keywords": [
     "actions",
